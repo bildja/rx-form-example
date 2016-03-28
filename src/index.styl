@@ -1,0 +1,37 @@
+@import '~purecss/build/forms.css'
+@import '~purecss/build/buttons.css'
+
+.app
+  display: flex
+  justify-content: center
+  align-items: center
+  height: 100%
+ 
+  .thank-you
+    display: none
+    
+  &.next
+    .thank-you
+      display: block
+      
+    .form-content
+      display: none
+
+  .form-field
+    margin-top: 8px
+    
+    input
+      display: block
+      width: 200px
+    
+    label
+      display: block
+      
+.submit-container
+  margin-top: 8px
+  text-align: right
+  
+  .marked
+    background: red
+    
+    

@@ -1,0 +1,10 @@
+export const prop = name => obj => obj[name];
+export const identity = value => value;
+export const map = fn => data => Array.prototype.map.call(data, fn);
+export const every = fn => data => Array.prototype.every.call(data, fn);
+export const some = fn => data => Array.prototype.some.call(data, fn);
+export const reduce = (fn, start) => data => Array.prototype.reduce.call(data, fn, start);
+export const pipe = (...fns) => data => reduce((acc, fn) => fn(acc), data)(fns);
+export const not = value => !value;
+export const first = ([value, ]) => value;
+export const last = value => value[value.length - 1];
