@@ -2,7 +2,6 @@ import Rx from 'rx'
 import './index.styl'
 import {
   map,
-  prop,
   pipe,
   every,
   first,
@@ -30,8 +29,13 @@ const inputStream = Rx.Observable.combineLatest(...inputStreams);
 const formValidityStream = inputStream.map(every(Boolean));
 const inputValidStream = formValidityStream.filter(identity);
 const inputInvalidStream = formValidityStream.filter(not);
-const formSubmitSuccess = formSubmit.withLatestFrom(formValidityStream)
+const formSubmitValidity = formSubmit.withLatestFrom(formValidityStream);
+const formSubmitSuccess = formSubmitValidity
   .filter(last)
+  .map(first);
+
+const formSubmitInvalid = formSubmitValidity
+  .filter(pipe(last, not))
   .map(first);
 
 Rx.Observable.merge(
@@ -52,6 +56,10 @@ formSubmit.subscribe(event => {
 
 formSubmitSuccess.subscribe(() => {
   rootElement.classList.toggle('next');
+});
+
+formSubmitInvalid.subscribe(() => {
+  alert('Invalid form');
 });
 
 Rx.Observable.merge(formSubmitSuccess, inputInvalidStream).subscribe(() => {
