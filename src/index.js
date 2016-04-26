@@ -18,25 +18,18 @@ const requiredElements = formElement.querySelectorAll('input[required]');
 const formSubmit = Rx.Observable.fromEvent(formElement, 'submit');
 
 const inputFromEvent = el => Rx.Observable.fromEvent(el, 'input')
-  .map(({
-    target
-  }) => target.value)
+  .map(event => event.target.value)
   .startWith('');
 
 const inputStreams = map(inputFromEvent)(requiredElements);
-const inputStream = Rx.Observable.combineLatest(...inputStreams);
 
-const formValidityStream = inputStream.map(every(Boolean));
-const inputValidStream = formValidityStream.filter(identity);
-const inputInvalidStream = formValidityStream.filter(not);
-const formSubmitValidity = formSubmit.withLatestFrom(formValidityStream);
-const formSubmitSuccess = formSubmitValidity
-  .filter(last)
-  .map(first);
+const formValidityStream = Rx.Observable.combineLatest(...inputStreams).map(every(Boolean));
+const [inputValidStream, inputInvalidStream] = formValidityStream.partition(identity);
 
-const formSubmitInvalid = formSubmitValidity
-  .filter(pipe(last, not))
-  .map(first);
+const [formSubmitSuccess, formSubmitInvalid] = map(stream => stream.map(first))(formSubmit
+  .withLatestFrom(formValidityStream)
+  .partition(last)
+);
 
 Rx.Observable.merge(
     formSubmitSuccess.map(() => false),
